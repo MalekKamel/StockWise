@@ -1,0 +1,15 @@
+app_identifier("com.stock.wise") # The bundle identifier of your app
+apple_id("TODO") # Your Apple email address
+
+# How to find? Go to:
+# https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/user/detail
+# It's the value with key: contentProviderId
+# Source: https://sarunw.com/posts/fastlane-find-team-id/
+itc_team_id("TODO") # App Store Connect Team ID
+team_id("TODO") # Developer Portal Team ID
+
+# TODO: don't use personal token
+ENV["FIREBASE_TOKEN"] = "TODO"
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

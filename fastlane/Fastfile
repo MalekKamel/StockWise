@@ -1,0 +1,487 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# Types: "app-store", "validation", "ad-hoc", "package", "enterprise", "development", "developer-id", "mac-application"
+# ENV["GYM_PROJECT"] = "PROJECT_NAME.xcodeproj"
+# ENV["GYM_WORKSPACE"] = "PROJECT_NAME.xcodeproj"
+
+BUILD_CONFIG_DEBUG = "Debug"
+BUILD_CONFIG_TESTING = "Testing"
+BUILD_CONFIG_STAGING = "Staging"
+BUILD_CONFIG_RELEASE = "Release"
+
+DESTINATION_FIREBASE = "Firebase"
+DESTINATION_TESTFLIGHT = "TestFlight"
+PROJECT_NAME="App.xcodeproj"
+
+EXPORT_METHOD_APPSTORE = "app-store"
+EXPORT_METHOD_DEVELOPMENT = "development"
+EXPORT_METHOD_AD_HOC = "ad-hoc"
+
+MATCH_METHOD_APPSTORE = "appstore"
+MATCH_METHOD_DEVELOPMENT = "development"
+TAG = "Fastlane_App_LOG: "
+
+
+default_platform(:ios)
+
+platform :ios do
+
+################################################################################
+# Firebase
+################################################################################
+
+  desc "Firebase distribute debug"
+  lane :firebase_distribute_debug do
+    distribute_firebase(configuration: BUILD_CONFIG_DEBUG)
+  end
+  desc "Firebase distribute debug"
+  lane :firebase_distribute_testing do
+    distribute_firebase(configuration: BUILD_CONFIG_TESTING)
+  end
+
+  desc "Firebase distribute staging"
+  lane :firebase_distribute_staging do
+    distribute_firebase(configuration: BUILD_CONFIG_STAGING)
+  end
+
+  desc "Firebase distribute release"
+  lane :firebase_distribute_release do
+    distribute_firebase(configuration: BUILD_CONFIG_RELEASE)
+  end
+
+################################################################################
+# TestFlight
+################################################################################
+
+    desc "TestFlight Staging"
+    lane :testflight_distribute_debug do
+        distribute_testflight(configuration: BUILD_CONFIG_DEBUG)
+     end
+
+    desc "TestFlight Staging"
+    lane :testflight_distribute_testing do
+        distribute_testflight(configuration: BUILD_CONFIG_TESTING)
+     end
+
+    desc "TestFlight Staging"
+    lane :testflight_distribute_staging do
+        distribute_testflight(configuration: BUILD_CONFIG_STAGING)
+     end
+
+    desc "TestFlight Release"
+    lane :testflight_distribute_release do
+        distribute_testflight(configuration: BUILD_CONFIG_RELEASE)
+     end
+
+################################################################################
+# Slack
+################################################################################
+
+    desc "Test Slack integration"
+    lane :send_slack_test do
+        send_slack_firebase_debug
+        send_slack_firebase_testing
+        send_slack_firebase_staging
+        send_slack_firebase_release
+        send_slack_testflight_debug
+        send_slack_testflight_testing
+        send_slack_testflight_staging
+        send_slack_testflight_release
+    end
+
+    desc "Test Slack integration"
+    lane :send_slack_firebase_debug do
+        slack_new_build(configuration: BUILD_CONFIG_DEBUG, destination: DESTINATION_FIREBASE)
+    end
+
+    desc "Test Slack integration"
+    lane :send_slack_firebase_testing do
+        slack_new_build(configuration: BUILD_CONFIG_TESTING, destination: DESTINATION_FIREBASE)
+    end
+
+    desc "Test Slack integration"
+    lane :send_slack_firebase_staging do
+        slack_new_build(configuration: BUILD_CONFIG_STAGING, destination: DESTINATION_FIREBASE)
+    end
+
+    desc "Test Slack integration"
+    lane :send_slack_firebase_release do
+        slack_new_build(configuration: BUILD_CONFIG_RELEASE, destination: DESTINATION_FIREBASE)
+    end
+
+    desc "Test Slack integration"
+    lane :send_slack_testflight_debug do
+        slack_new_build(configuration: BUILD_CONFIG_DEBUG, destination: DESTINATION_TESTFLIGHT)
+    end
+
+    desc "Test Slack integration"
+    lane :send_slack_testflight_testing do
+        slack_new_build(configuration: BUILD_CONFIG_TESTING, destination: DESTINATION_TESTFLIGHT)
+    end
+
+    desc "Test Slack integration"
+    lane :send_slack_testflight_staging do
+        slack_new_build(configuration: BUILD_CONFIG_STAGING, destination: DESTINATION_TESTFLIGHT)
+    end
+
+    desc "Test Slack integration"
+    lane :send_slack_testflight_release do
+        slack_new_build(configuration: BUILD_CONFIG_RELEASE, destination: DESTINATION_TESTFLIGHT)
+    end
+
+################################################################################
+# Test release  notes
+################################################################################
+
+    desc "Test configuration"
+    lane :test_release_notes do
+       puts release_notes_with_config_and_version(configuration: BUILD_CONFIG_DEBUG)
+       puts release_notes_with_config_and_version(configuration: BUILD_CONFIG_TESTING)
+       puts release_notes_with_config_and_version(configuration: BUILD_CONFIG_STAGING)
+       puts release_notes_with_config_and_version(configuration: BUILD_CONFIG_RELEASE)
+    end
+
+################################################################################
+# Run tests
+################################################################################
+
+    desc "Run tests"
+    lane :run_all_tests do
+        run_tests(scheme: "#{ENV['SCHEME']}")
+    end
+
+################################################################################
+# Bump version
+################################################################################
+
+    lane :bump_version do
+            bump_version(configuration: BUILD_CONFIG_TESTING, destination: DESTINATION_FIREBASE)
+    end
+
+################################################################################
+# Keychain
+################################################################################
+
+    desc "Test keychain"
+    lane :test_keychain do
+        ensure_temp_keychain()
+        delete_temp_keychain()
+    end
+
+    def ensure_temp_keychain()
+        name = ENV["TEMP_KEYCHAIN_NAME"]
+        password = ENV["TEMP_KEYCHAIN_PASSWORD"]
+        delete_temp_keychain()
+        create_temp_keychain(name, password)
+    end
+
+    def create_temp_keychain(name, password)
+    create_keychain(
+        name: name,
+        password: password,
+        unlock: true,
+        timeout: 0,
+        require_create: false
+    )
+    end
+
+    def delete_temp_keychain()
+        name = ENV["TEMP_KEYCHAIN_NAME"]
+        if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
+            delete_keychain(name: name)
+        end
+    end
+
+
+################################################################################
+# Keychain
+################################################################################
+
+    lane :test_upload_symbols do
+        upload_debug_symbols(configuration: BUILD_CONFIG_RELEASE)
+    end
+
+    def upload_debug_symbols(configuration: String)
+        gsp_path = google_service_info_file_name(configuration: configuration)
+        upload_symbols_to_crashlytics(
+            gsp_path: gsp_path,
+            binary_path: './etc/firebase/crashlytics/upload-symbols',
+            dsym_path: "./StockWise.app.dSYM.zip"
+        )
+    end
+
+################################################################################
+# Match
+################################################################################
+
+    desc "Match"
+    lane :run_match_nuke do
+         match_nuke_development()
+    end
+
+    desc "Match"
+    lane :run_match do
+         run_match_development
+         run_match_appstore
+    end
+
+    desc "Match"
+    lane :run_match_force do
+         run_match_development_force
+         run_match_appstore_force
+    end
+
+    desc "Match"
+    lane :run_match_development do
+        match_appstore_connect_development(force: false)
+    end
+
+    desc "Match"
+    lane :run_match_appstore do
+        match_appstore_connect_appstore(force: false)
+    end
+
+    desc "Match"
+    lane :run_match_development_force do
+        match_appstore_connect_development(force: true)
+    end
+
+    desc "Match"
+    lane :run_match_appstore_force do
+        match_appstore_connect_appstore(force: true)
+    end
+
+################################################################################
+# Shared
+################################################################################
+
+    def match_nuke_development()
+        app_store_connect_api_key(
+            key_id: "TODO",
+            issuer_id: "TODO",
+            key_content: "TODO",
+            is_key_content_base64: true
+        )
+
+        match_nuke({
+            type: MATCH_METHOD_APPSTORE,
+            readonly: false,
+            git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION_CODE_SIGNING"]),
+            keychain_name: ENV["TEMP_KEYCHAIN_NAME"],
+            keychain_password: ENV["TEMP_KEYCHAIN_PASSWORD"]
+        })
+    end
+
+    def match_appstore_connect_development(force: Boolean)
+        match_appstore_connect(
+            method: MATCH_METHOD_DEVELOPMENT,
+            force: force)
+    end
+
+    def match_appstore_connect_appstore(force: Boolean)
+        match_appstore_connect(
+            method: MATCH_METHOD_APPSTORE,
+            force: force)
+    end
+
+    def match_appstore_connect(
+            method: String,
+            force: Boolean)
+        ensure_temp_keychain()
+        setup_app_store_connect_api_key()
+        match(
+            type: method,
+            git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION_CODE_SIGNING"]),
+            readonly: false,
+            force: force,
+            keychain_name: ENV["TEMP_KEYCHAIN_NAME"],
+            keychain_password: ENV["TEMP_KEYCHAIN_PASSWORD"]
+        )
+    end
+
+    def setup_app_store_connect_api_key()
+        # To generate AppStore key:
+        # https://sarunw.com/posts/using-app-store-connect-api-with-fastlane-match/
+        app_store_connect_api_key(
+            key_id: "TODO",
+            issuer_id: "TODO",
+            key_content: "TODO",
+            is_key_content_base64: true
+        )
+    end
+
+    def distribute_testflight(configuration: String)
+            match_appstore_connect_appstore(force: false)
+
+            bump_version(configuration: configuration, destination: DESTINATION_TESTFLIGHT)
+
+            build_application(configuration: configuration, method: EXPORT_METHOD_APPSTORE)
+            upload_to_testflight(
+                changelog: release_notes_with_config_and_version(configuration: configuration),
+                skip_waiting_for_build_processing: true
+            )
+            upload_debug_symbols(configuration: configuration)
+            slack_new_build(configuration: configuration, destination: DESTINATION_TESTFLIGHT)
+    end
+
+    def distribute_firebase(configuration: String)
+            match_connect(configuration: configuration)
+
+            bump_version(configuration: configuration, destination: DESTINATION_FIREBASE)
+
+            build_application(configuration: configuration, method: export_method(configuration: configuration))
+
+            firebase_app_distribution(
+                app: firebase_app_id(configuration: configuration),
+                groups: "testers",
+                release_notes: release_notes_with_config_and_version(configuration: configuration),
+                debug: true
+            )
+
+            upload_debug_symbols(configuration: configuration)
+
+            slack_new_build(configuration: configuration, destination: DESTINATION_FIREBASE)
+    end
+
+    def match_connect(configuration: String)
+      case configuration
+            when BUILD_CONFIG_DEBUG
+                match_appstore_connect_development(force: false)
+            when BUILD_CONFIG_TESTING
+                match_appstore_connect_development(force: false)
+            when BUILD_CONFIG_STAGING
+                match_appstore_connect_development(force: false)
+            when BUILD_CONFIG_RELEASE
+                match_appstore_connect_appstore(force: false)
+        end
+    end
+
+    def build_application(configuration: String, method: String)
+            build_ios_app(
+                scheme: "#{ENV['SCHEME']}",
+                configuration: configuration,
+                export_options: {
+                method: method,
+                compileBitcode: false
+                },
+                include_bitcode: false
+            )
+    end
+
+    def bump_version(configuration: String, destination: String)
+         case destination
+                when DESTINATION_TESTFLIGHT
+                    bump_version_testflight()
+                when DESTINATION_FIREBASE
+                    bump_version_firebase(configuration: configuration)
+         end
+    end
+
+    def bump_version_testflight()
+        latest_release = latest_testflight_build_number(version: current_version())
+        increment_build_number({ build_number: latest_release + 1 })
+    end
+
+    def bump_version_firebase(configuration: String)
+        latest_release = firebase_app_distribution_get_latest_release(app: firebase_app_id(configuration: configuration))
+        current = 0
+        if latest_release != nil
+            current = latest_release[:buildVersion].to_i
+        end
+        increment_build_number({ build_number: current + 1 })
+    end
+
+    def current_version()
+        get_version_number(xcodeproj: PROJECT_NAME, target: "#{ENV['SCHEME']}")
+    end
+
+    def current_version_code()
+        get_build_number(xcodeproj: PROJECT_NAME)
+    end
+
+    def release_notes_with_config_and_version(configuration: String)
+        "#" +
+        configuration +
+        " " +
+        version_description() +
+        "\n\n" +
+        release_notes()
+    end
+
+    def release_notes()
+        File.read("./release_notes").strip
+    end
+
+    def slack_release_notes()
+      release_notes() +
+      "\n\n"
+#       TODO: mentions testing team
+#       "<!subteam^TODO>"
+    end
+
+    def slack_new_build(configuration: String, destination: String)
+        @notes = "#iOS " +
+                 ENV['APP_NAME'] +
+                 " " +
+                 version_description() +
+                 " " +
+                 configuration +
+                 " [" +
+                 destination +
+                 "]"
+        slack(
+            message: @notes,
+            payload: {
+                    "Release Notes" => slack_release_notes()
+            },
+            default_payloads: []
+            )
+    end
+
+    def version_description()
+        "#" +
+        current_version() +
+        "(" +
+        current_version_code() +
+        ")"
+    end
+
+    def google_service_info_file_name(configuration: String)
+        case configuration
+            when BUILD_CONFIG_DEBUG then "App/Firebase/GoogleService-Info-Debug.plist"
+            when BUILD_CONFIG_TESTING then "App/Firebase/GoogleService-Info-Testing.plist"
+            when BUILD_CONFIG_STAGING then "App/Firebase/GoogleService-Info-Staging.plist"
+            when BUILD_CONFIG_RELEASE then "App/Firebase/GoogleService-Info-PROD.plist"
+        end
+    end
+
+    def firebase_app_id(configuration: String)
+        case configuration
+            when BUILD_CONFIG_DEBUG   then "TODO"
+            when BUILD_CONFIG_TESTING then "TODO"
+            when BUILD_CONFIG_STAGING then "TODO"
+            when BUILD_CONFIG_RELEASE then "TODO"
+        end
+    end
+
+    def export_method(configuration: String)
+        case configuration
+            when BUILD_CONFIG_DEBUG   then EXPORT_METHOD_DEVELOPMENT
+            when BUILD_CONFIG_TESTING then EXPORT_METHOD_DEVELOPMENT
+            when BUILD_CONFIG_STAGING then EXPORT_METHOD_DEVELOPMENT
+            when BUILD_CONFIG_RELEASE then EXPORT_METHOD_AD_HOC
+        end
+    end
+
+end

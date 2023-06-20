@@ -1,0 +1,88 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Alamofire",
+        "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
+        "state": {
+          "branch": null,
+          "revision": "bc268c28fb170f494de9e9927c371b8342979ece",
+          "version": "5.7.1"
+        }
+      },
+      {
+        "package": "Cache",
+        "repositoryURL": "https://github.com/hyperoslo/Cache.git",
+        "state": {
+          "branch": null,
+          "revision": "c7f4d633049c3bd649a353bad36f6c17e9df085f",
+          "version": "6.0.0"
+        }
+      },
+      {
+        "package": "IQKeyboardManagerSwift",
+        "repositoryURL": "https://github.com/hackiftekhar/IQKeyboardManager.git",
+        "state": {
+          "branch": null,
+          "revision": "ea08e08958890043019d248065fe3d825f338087",
+          "version": "6.5.12"
+        }
+      },
+      {
+        "package": "Kingfisher",
+        "repositoryURL": "https://github.com/onevcat/Kingfisher.git",
+        "state": {
+          "branch": null,
+          "revision": "c1f60c63f356d364f4284ba82961acbe7de79bcc",
+          "version": "7.8.1"
+        }
+      },
+      {
+        "package": "Moya",
+        "repositoryURL": "https://github.com/Moya/Moya.git",
+        "state": {
+          "branch": null,
+          "revision": "c263811c1f3dbf002be9bd83107f7cdc38992b26",
+          "version": "15.0.3"
+        }
+      },
+      {
+        "package": "ReactiveSwift",
+        "repositoryURL": "https://github.com/ReactiveCocoa/ReactiveSwift.git",
+        "state": {
+          "branch": null,
+          "revision": "c43bae3dac73fdd3cb906bd5a1914686ca71ed3c",
+          "version": "6.7.0"
+        }
+      },
+      {
+        "package": "RxSwift",
+        "repositoryURL": "https://github.com/ReactiveX/RxSwift.git",
+        "state": {
+          "branch": null,
+          "revision": "9dcaa4b333db437b0fbfaf453fad29069044a8b4",
+          "version": "6.6.0"
+        }
+      },
+      {
+        "package": "SwiftMessages",
+        "repositoryURL": "https://github.com/SwiftKickMobile/SwiftMessages",
+        "state": {
+          "branch": null,
+          "revision": "b29dd21090b708aa0ae9ecbaf6e2d0487028dc3f",
+          "version": "9.0.6"
+        }
+      },
+      {
+        "package": "SwiftUINavigator",
+        "repositoryURL": "https://github.com/Open-Bytes/SwiftUINavigator",
+        "state": {
+          "branch": null,
+          "revision": "10331bdb5d0b6381cdb587a1d7ad32fdd3f11177",
+          "version": "1.0.4"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
