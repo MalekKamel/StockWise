@@ -9,7 +9,7 @@ import FlutterPluginRegistrant
 
 @UIApplicationMain
 class AppDelegate: FlutterAppDelegate, ObservableObject {
-    lazy var engine: FlutterEngine = FlutterEngine.init(name: "StockWise")
+    lazy var engine: FlutterEngine = FlutterEngine.init(name: "ios.flutter")
 
     override func application(
             _ application: UIApplication,
@@ -20,7 +20,7 @@ class AppDelegate: FlutterAppDelegate, ObservableObject {
 
 
         // Connects plugins with iOS platform code to this app.
-        GeneratedPluginRegistrant.register(with: self)
+        GeneratedPluginRegistrant.register(with: engine)
 
         AppKeyboardManager.setup()
 
