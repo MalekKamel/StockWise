@@ -18,7 +18,6 @@ class AppDelegate: FlutterAppDelegate, ObservableObject {
         // Runs the default Dart entrypoint with a default Flutter route.
         engine.run()
 
-
         // Connects plugins with iOS platform code to this app.
         GeneratedPluginRegistrant.register(with: engine)
 

@@ -6,6 +6,7 @@
 import Foundation
 
 protocol StockDataSrcContract {
+    func loadStockChartData(ticker: String, date: Date) async throws -> [Stock]
 }
 
 struct StockDataSrc: StockDataSrcContract {
@@ -13,5 +14,12 @@ struct StockDataSrc: StockDataSrcContract {
 
     init(api: StockApiProvider) {
         self.api = api
+    }
+
+    func loadStockChartData(ticker: String, date: Date) async throws -> [Stock] {
+        let response: StockChartDataResponse = try await api.request(
+                target: .stockChartData(symbol: ticker, startTimestamp: String(Int(date.timeIntervalSince1970)))
+        )
+        return StockMapper.fromChartDataResponse(response)
     }
 }

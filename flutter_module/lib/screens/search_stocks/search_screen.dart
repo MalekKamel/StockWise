@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart' hide DatePickerTheme;
+import 'package:flutter_module/shared/core/date/app_date.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:yahoo_finance_data_reader/yahoo_finance_data_reader.dart';
+
+import '../../pigeon/api.dart';
+import '../../main.dart';
 
 class SearchStockScreen extends StatefulWidget {
-  const SearchStockScreen({super.key});
+  SearchStockScreen({super.key});
+
+  late HostStocksApi hostApi;
+  List<Stock> stocks = [];
 
   @override
   State<SearchStockScreen> createState() => _SearchStockScreenState();
@@ -13,13 +19,21 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
   final TextEditingController controller = TextEditingController(
     text: 'GOOG',
   );
-  late Future<List<YahooFinanceCandleData>> future;
   DateTime? startDate;
 
   @override
   void initState() {
     super.initState();
-    load();
+    _setup();
+  }
+
+  _setup() {
+    widget.hostApi = HostStocksApi();
+    FlutterStocksApi.setup(FlutterStockApiHandler((stocks) {
+      setState(() {
+        widget.stocks = stocks.nonNulls.toList();
+      });
+    }));
   }
 
   @override
@@ -63,7 +77,7 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
           setState(() {
             startDate = selectedDate;
           });
-          load();
+          loadChartData();
         },
         color: Theme.of(context).primaryColor,
         textColor: Colors.white,
@@ -74,54 +88,21 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
 
   Widget _chartView() {
     return Expanded(
-      child: FutureBuilder(
-        future: future,
-        builder: (BuildContext context,
-            AsyncSnapshot<List<YahooFinanceCandleData>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.data == null) {
-              return const Text('No data');
-            }
-
-            return _linearChartView(snapshot.data ?? []);
-          } else {
-            return const Center(
-              child: SizedBox(
-                height: 50,
-                width: 50,
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _linearChartView(List<YahooFinanceCandleData> list) {
-    return SfCartesianChart(
+        child: SfCartesianChart(
       primaryXAxis: DateTimeAxis(),
-      series: <LineSeries<YahooFinanceCandleData, DateTime>>[
-        LineSeries<YahooFinanceCandleData, DateTime>(
-          dataSource: list,
-          xValueMapper: (YahooFinanceCandleData data, _) => data.date,
-          yValueMapper: (YahooFinanceCandleData data, _) => data.close,
+      series: <LineSeries<Stock, DateTime>>[
+        LineSeries<Stock, DateTime>(
+          dataSource: widget.stocks,
+          xValueMapper: (Stock data, _) => DateTime.parse(data.date),
+          yValueMapper: (Stock data, _) => data.close,
         ),
       ],
-    );
+    ));
   }
 
-  void load() async {
-    future = YahooFinanceService().getTickerData(
-      controller.text,
-      useCache: false,
-      startDate: startDate ??
-          DateTime(
-            DateTime.now().year,
-            DateTime.now().month,
-            DateTime.now().day,
-          ),
-    );
+  void loadChartData() async {
+    widget.hostApi.loadStocks(
+        controller.text, AppDate.format(startDate ?? DateTime.now()));
   }
 
   Future<DateTime?> _selectDate(BuildContext context) async {

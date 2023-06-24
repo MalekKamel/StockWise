@@ -5,20 +5,11 @@
 import SwiftUI
 import Flutter
 
-typealias MethodCallHandler = (_ call: FlutterMethodCall, _ result: @escaping FlutterResult) -> Void
-
-struct FlutterView: UIViewControllerRepresentable {
-
-    func makeUIViewController(context: Context) -> FlutterViewController {
-        FlutterViewController(project: nil, nibName: nil, bundle: nil)
-    }
-
-    func updateUIViewController(_ uiViewController: FlutterViewController, context: Context) {
-    }
-}
+import SwiftUI
+import Flutter
 
 struct StocksScreen: AppScreen {
-    @ObservedObject var vm: StocksVM
+    @StateObject var vm: StocksVM
     @EnvironmentObject var navigator: Navigator
 
     @StateObject var flutterDependencies = FlutterDependencies()
@@ -31,8 +22,7 @@ struct StocksScreen: AppScreen {
 extension StocksScreen {
 
     static func build() -> some View {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let api = FlutterStocksApi(binaryMessenger: appDelegate.engine.binaryMessenger)
+        let api = FlutterStocksApi(binaryMessenger: UIApplication.binaryMessenger)
         let vm = StocksVM(stocksApi: api)
         return StocksScreen(vm: vm)
     }

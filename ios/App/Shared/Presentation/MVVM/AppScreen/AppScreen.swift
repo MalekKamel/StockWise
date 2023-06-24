@@ -11,11 +11,8 @@ protocol AppScreen: View, Reportable {
     associatedtype Content: View
     associatedtype Background: View
     associatedtype StatusBarBackground: View
-    associatedtype ViewModel: AppViewModel
 
 // TODO: reimplement vm later
-    /// The viewModel of this screen
-    var vm: ViewModel { get set }
     var backgroundColor: Background { get }
     var statusBarBackground: StatusBarBackground { get }
     var statusBarHeight: CGFloat { get }
