@@ -1,37 +1,42 @@
 import 'package:flutter/material.dart' hide DatePickerTheme;
-import 'package:flutter_module/shared/core/date/app_date.dart';
+import 'package:flutter_module/screens/search_stocks/search_stocks_vm.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../pigeon/api.dart';
 
 class SearchStockScreen extends StatefulWidget {
-  SearchStockScreen({super.key});
+  SearchStockScreen({super.key, required this.vm});
 
-  late HostStocksApi hostApi;
-  List<StockChartData> stockChartData = [];
-  List<Stock> stocks = [];
+  SearchStocksVM vm;
 
   @override
   State<SearchStockScreen> createState() => _SearchStockScreenState();
+
+  static SearchStockScreen build() {
+    final vm = SearchStocksVM();
+    return SearchStockScreen(vm: vm);
+  }
 }
 
-class _SearchStockScreenState extends State<SearchStockScreen>
-    implements FlutterStocksApi {
-  final TextEditingController controller = TextEditingController(
+class _SearchStockScreenState extends State<SearchStockScreen> {
+  final controller = TextEditingController(
     text: 'TSLA',
   );
-  DateTime? startDate;
 
   @override
   void initState() {
     super.initState();
-    _setup();
-    loadStocks();
+    loadChartData();
   }
 
-  _setup() {
-    widget.hostApi = HostStocksApi();
-    FlutterStocksApi.setup(this);
+  void loadChartData() async {
+    widget.vm.loadChartData();
+    setState(() {});
+  }
+
+  void loadStocks() async {
+    widget.vm.loadStocks();
+    setState(() {});
   }
 
   @override
@@ -60,6 +65,9 @@ class _SearchStockScreenState extends State<SearchStockScreen>
   Widget _searchTextField() {
     return TextField(
       controller: controller,
+      onChanged: (text) {
+        widget.vm.symbol = text;
+      },
     );
   }
 
@@ -74,7 +82,7 @@ class _SearchStockScreenState extends State<SearchStockScreen>
             return;
           }
           setState(() {
-            startDate = selectedDate;
+            widget.vm.startDate = selectedDate;
           });
           loadChartData();
         },
@@ -91,24 +99,12 @@ class _SearchStockScreenState extends State<SearchStockScreen>
       primaryXAxis: DateTimeAxis(),
       series: <LineSeries<StockChartData, DateTime>>[
         LineSeries<StockChartData, DateTime>(
-          dataSource: widget.stockChartData,
+          dataSource: widget.vm.stockChartData,
           xValueMapper: (StockChartData data, _) => DateTime.parse(data.date),
           yValueMapper: (StockChartData data, _) => data.close,
         ),
       ],
     ));
-  }
-
-  void loadChartData() async {
-    final response = await widget.hostApi.loadStockChart(
-        controller.text, AppDate.format(startDate ?? DateTime.now()));
-    widget.stockChartData = response.nonNulls.toList();
-  }
-
-  void loadStocks() async {
-    final response = await widget.hostApi.loadStocks();
-    widget.stocks = response.nonNulls.toList();
-    setState(() {});
   }
 
   Future<DateTime?> _selectDate(BuildContext context) async {
@@ -122,5 +118,4 @@ class _SearchStockScreenState extends State<SearchStockScreen>
       lastDate: DateTime(2100),
     );
   }
-
 }
