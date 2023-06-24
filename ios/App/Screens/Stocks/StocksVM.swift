@@ -11,6 +11,7 @@ class StocksVM: AppViewModel {
     let stocksApi: FlutterStocksApi
     let stockRepo: StockRepoContract
     @Published var count = 0
+    @Published var stockChartData: [StockChartData] = []
     @Published var stocks: [Stock] = []
 
     init(stocksApi: FlutterStocksApi,
@@ -22,25 +23,33 @@ class StocksVM: AppViewModel {
         HostStocksApiSetup.setUp(binaryMessenger: UIApplication.binaryMessenger, api: self)
     }
 
-    func loadStockChartData(ticker: String, date: Date) {
-        request { [weak self] in
-            guard let self else {
-                return
-            }
-            let response = try await self.stockRepo.loadStockChartData(ticker: ticker, date: date)
-            onMainThread {
-                self.stocks = response
-                self.stocksApi.showStock(stocks: response) {
-                }
-            }
-        }
-    }
-
 }
 
 extension StocksVM: HostStocksApi {
 
-    func loadStocks(symbol: String, date: String) throws {
-        loadStockChartData(ticker: symbol, date: AppDate.date(from: date))
+    func loadStockChart(symbol: String, date: String, completion: @escaping (Result<[StockChartData], Error>) -> Void) {
+        request { [weak self] in
+            guard let self else {
+                return
+            }
+            let response = try await self.stockRepo.loadStockChartData(ticker: symbol, date: AppDate.date(from: date))
+            onMainThread {
+                self.stockChartData = response
+                completion(Result.success(response))
+            }
+        }
+    }
+
+    func loadStocks(completion: @escaping (Result<[Stock], Error>) -> Void) {
+        request { [weak self] in
+            guard let self else {
+                return
+            }
+            let response = try await self.stockRepo.loadStocks()
+            onMainThread {
+                self.stocks = StockMapper.fromStockResponse(response)
+                completion(Result.success(self.stocks))
+            }
+        }
     }
 }

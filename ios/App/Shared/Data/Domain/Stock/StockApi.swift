@@ -9,25 +9,34 @@ import Foundation
 typealias StockApiProvider = MoyaProvider<StockApi>
 
 enum StockApi {
+    case stocks
     case stockChartData(symbol: String, startTimestamp: String)
 }
 
 extension StockApi: MoyaTargetType {
 
     var baseURL: URL {
-        URL(string: "https://query2.finance.yahoo.com/v8/finance/chart")!
+        switch self {
+        case .stocks:
+            return URL(string: "https://run.mocky.io/v3")!
+        case .stockChartData(let symbol, _):
+            return URL(string: "https://query2.finance.yahoo.com/v8/finance/chart")!
+        }
     }
 
     public var path: String {
         switch self {
-        case .stockChartData(let symbol,  _):
+        case .stocks:
+            return "2b63ba43-6440-4780-aa13-91e6d8247305"
+        case .stockChartData(let symbol, _):
             return symbol.uppercased()
         }
     }
 
     public var method: Moya.Method {
         switch self {
-        case .stockChartData:
+        case .stocks,
+             .stockChartData:
             return .get
         }
     }
@@ -43,6 +52,8 @@ extension StockApi: MoyaTargetType {
                 "events": "div,splits"
             ]
             return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
+        case .stocks:
+            return .requestPlain
         }
     }
 }

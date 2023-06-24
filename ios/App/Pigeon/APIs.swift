@@ -36,6 +36,40 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct Stock {
+  var symbol: String
+  var companyName: String
+  var avgPrice: Double
+  var quantity: Double
+  var ltp: Double
+
+  static func fromList(_ list: [Any?]) -> Stock? {
+    let symbol = list[0] as! String
+    let companyName = list[1] as! String
+    let avgPrice = list[2] as! Double
+    let quantity = list[3] as! Double
+    let ltp = list[4] as! Double
+
+    return Stock(
+      symbol: symbol,
+      companyName: companyName,
+      avgPrice: avgPrice,
+      quantity: quantity,
+      ltp: ltp
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      symbol,
+      companyName,
+      avgPrice,
+      quantity,
+      ltp,
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct StockChartData {
   var date: String
   /// Open price
   var open: Double
@@ -50,7 +84,7 @@ struct Stock {
   /// Adjusted close price, by splits and dividends
   var adjClose: Double
 
-  static func fromList(_ list: [Any?]) -> Stock? {
+  static func fromList(_ list: [Any?]) -> StockChartData? {
     let date = list[0] as! String
     let open = list[1] as! Double
     let high = list[2] as! Double
@@ -59,7 +93,7 @@ struct Stock {
     let volume = list[5] is Int64 ? list[5] as! Int64 : Int64(list[5] as! Int32)
     let adjClose = list[6] as! Double
 
-    return Stock(
+    return StockChartData(
       date: date,
       open: open,
       high: high,
@@ -81,41 +115,6 @@ struct Stock {
     ]
   }
 }
-private class FlutterStocksApiCodecReader: FlutterStandardReader {
-  override func readValue(ofType type: UInt8) -> Any? {
-    switch type {
-      case 128:
-        return Stock.fromList(self.readValue() as! [Any?])
-      default:
-        return super.readValue(ofType: type)
-    }
-  }
-}
-
-private class FlutterStocksApiCodecWriter: FlutterStandardWriter {
-  override func writeValue(_ value: Any) {
-    if let value = value as? Stock {
-      super.writeByte(128)
-      super.writeValue(value.toList())
-    } else {
-      super.writeValue(value)
-    }
-  }
-}
-
-private class FlutterStocksApiCodecReaderWriter: FlutterStandardReaderWriter {
-  override func reader(with data: Data) -> FlutterStandardReader {
-    return FlutterStocksApiCodecReader(data: data)
-  }
-
-  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return FlutterStocksApiCodecWriter(data: data)
-  }
-}
-
-class FlutterStocksApiCodec: FlutterStandardMessageCodec {
-  static let shared = FlutterStocksApiCodec(readerWriter: FlutterStocksApiCodecReaderWriter())
-}
 
 /// Generated class from Pigeon that represents Flutter messages that can be called from Swift.
 class FlutterStocksApi {
@@ -123,37 +122,88 @@ class FlutterStocksApi {
   init(binaryMessenger: FlutterBinaryMessenger){
     self.binaryMessenger = binaryMessenger
   }
-  var codec: FlutterStandardMessageCodec {
-    return FlutterStocksApiCodec.shared
-  }
-  func showStock(stocks stocksArg: [Stock], completion: @escaping () -> Void) {
-    let channel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.FlutterStocksApi.showStock", binaryMessenger: binaryMessenger, codec: codec)
-    channel.sendMessage([stocksArg] as [Any?]) { _ in
-      completion()
+}
+private class HostStocksApiCodecReader: FlutterStandardReader {
+  override func readValue(ofType type: UInt8) -> Any? {
+    switch type {
+      case 128:
+        return Stock.fromList(self.readValue() as! [Any?])
+      case 129:
+        return StockChartData.fromList(self.readValue() as! [Any?])
+      default:
+        return super.readValue(ofType: type)
     }
   }
 }
+
+private class HostStocksApiCodecWriter: FlutterStandardWriter {
+  override func writeValue(_ value: Any) {
+    if let value = value as? Stock {
+      super.writeByte(128)
+      super.writeValue(value.toList())
+    } else if let value = value as? StockChartData {
+      super.writeByte(129)
+      super.writeValue(value.toList())
+    } else {
+      super.writeValue(value)
+    }
+  }
+}
+
+private class HostStocksApiCodecReaderWriter: FlutterStandardReaderWriter {
+  override func reader(with data: Data) -> FlutterStandardReader {
+    return HostStocksApiCodecReader(data: data)
+  }
+
+  override func writer(with data: NSMutableData) -> FlutterStandardWriter {
+    return HostStocksApiCodecWriter(data: data)
+  }
+}
+
+class HostStocksApiCodec: FlutterStandardMessageCodec {
+  static let shared = HostStocksApiCodec(readerWriter: HostStocksApiCodecReaderWriter())
+}
+
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol HostStocksApi {
-  func loadStocks(symbol: String, date: String) throws
+  func loadStockChart(symbol: String, date: String, completion: @escaping (Result<[StockChartData], Error>) -> Void)
+  func loadStocks(completion: @escaping (Result<[Stock], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class HostStocksApiSetup {
   /// The codec used by HostStocksApi.
+  static var codec: FlutterStandardMessageCodec { HostStocksApiCodec.shared }
   /// Sets up an instance of `HostStocksApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: HostStocksApi?) {
-    let loadStocksChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.HostStocksApi.loadStocks", binaryMessenger: binaryMessenger)
+    let loadStockChartChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.HostStocksApi.loadStockChart", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      loadStocksChannel.setMessageHandler { message, reply in
+      loadStockChartChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let symbolArg = args[0] as! String
         let dateArg = args[1] as! String
-        do {
-          try api.loadStocks(symbol: symbolArg, date: dateArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
+        api.loadStockChart(symbol: symbolArg, date: dateArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      loadStockChartChannel.setMessageHandler(nil)
+    }
+    let loadStocksChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.HostStocksApi.loadStocks", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      loadStocksChannel.setMessageHandler { _, reply in
+        api.loadStocks() { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
         }
       }
     } else {

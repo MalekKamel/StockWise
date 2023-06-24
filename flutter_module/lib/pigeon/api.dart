@@ -10,6 +10,47 @@ import 'package:flutter/services.dart';
 
 class Stock {
   Stock({
+    required this.symbol,
+    required this.companyName,
+    required this.avgPrice,
+    required this.quantity,
+    required this.ltp,
+  });
+
+  String symbol;
+
+  String companyName;
+
+  double avgPrice;
+
+  double quantity;
+
+  double ltp;
+
+  Object encode() {
+    return <Object?>[
+      symbol,
+      companyName,
+      avgPrice,
+      quantity,
+      ltp,
+    ];
+  }
+
+  static Stock decode(Object result) {
+    result as List<Object?>;
+    return Stock(
+      symbol: result[0]! as String,
+      companyName: result[1]! as String,
+      avgPrice: result[2]! as double,
+      quantity: result[3]! as double,
+      ltp: result[4]! as double,
+    );
+  }
+}
+
+class StockChartData {
+  StockChartData({
     required this.date,
     required this.open,
     required this.high,
@@ -51,9 +92,9 @@ class Stock {
     ];
   }
 
-  static Stock decode(Object result) {
+  static StockChartData decode(Object result) {
     result as List<Object?>;
-    return Stock(
+    return StockChartData(
       date: result[0]! as String,
       open: result[1]! as double,
       high: result[2]! as double,
@@ -65,12 +106,22 @@ class Stock {
   }
 }
 
-class _FlutterStocksApiCodec extends StandardMessageCodec {
-  const _FlutterStocksApiCodec();
+abstract class FlutterStocksApi {
+  static const MessageCodec<Object?> codec = StandardMessageCodec();
+
+  static void setup(FlutterStocksApi? api, {BinaryMessenger? binaryMessenger}) {
+  }
+}
+
+class _HostStocksApiCodec extends StandardMessageCodec {
+  const _HostStocksApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
     if (value is Stock) {
       buffer.putUint8(128);
+      writeValue(buffer, value.encode());
+    } else if (value is StockChartData) {
+      buffer.putUint8(129);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -82,36 +133,10 @@ class _FlutterStocksApiCodec extends StandardMessageCodec {
     switch (type) {
       case 128: 
         return Stock.decode(readValue(buffer)!);
+      case 129: 
+        return StockChartData.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
-    }
-  }
-}
-
-abstract class FlutterStocksApi {
-  static const MessageCodec<Object?> codec = _FlutterStocksApiCodec();
-
-  void showStock(List<Stock?> stocks);
-
-  static void setup(FlutterStocksApi? api, {BinaryMessenger? binaryMessenger}) {
-    {
-      final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.FlutterStocksApi.showStock', codec,
-          binaryMessenger: binaryMessenger);
-      if (api == null) {
-        channel.setMessageHandler(null);
-      } else {
-        channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.FlutterStocksApi.showStock was null.');
-          final List<Object?> args = (message as List<Object?>?)!;
-          final List<Stock?>? arg_stocks = (args[0] as List<Object?>?)?.cast<Stock?>();
-          assert(arg_stocks != null,
-              'Argument for dev.flutter.pigeon.FlutterStocksApi.showStock was null, expected non-null List<Stock?>.');
-          api.showStock(arg_stocks!);
-          return;
-        });
-      }
     }
   }
 }
@@ -124,11 +149,11 @@ class HostStocksApi {
       : _binaryMessenger = binaryMessenger;
   final BinaryMessenger? _binaryMessenger;
 
-  static const MessageCodec<Object?> codec = StandardMessageCodec();
+  static const MessageCodec<Object?> codec = _HostStocksApiCodec();
 
-  Future<void> loadStocks(String arg_symbol, String arg_date) async {
+  Future<List<StockChartData?>> loadStockChart(String arg_symbol, String arg_date) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.HostStocksApi.loadStocks', codec,
+        'dev.flutter.pigeon.HostStocksApi.loadStockChart', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_symbol, arg_date]) as List<Object?>?;
@@ -143,8 +168,40 @@ class HostStocksApi {
         message: replyList[1] as String?,
         details: replyList[2],
       );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
     } else {
-      return;
+      return (replyList[0] as List<Object?>?)!.cast<StockChartData?>();
+    }
+  }
+
+  Future<List<Stock?>> loadStocks() async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.HostStocksApi.loadStocks', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (replyList[0] as List<Object?>?)!.cast<Stock?>();
     }
   }
 }

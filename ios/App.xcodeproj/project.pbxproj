@@ -92,6 +92,7 @@
 		58B8391CCF61A81DC66BEF73 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B83CA1EA044C22FDF74B4C /* AppLanguage.swift */; };
 		58B839248DA8CC4BB2419D3D /* Shimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B836AC07CB982222FD2B23 /* Shimmer.swift */; };
 		58B83925510AE71983263F17 /* String+ToInt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B83EF7F249A81B3A6E06DD /* String+ToInt.swift */; };
+		58B8394F42D696E1DD36B9E2 /* StockResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B83C15AD89C3E512D3713D /* StockResponse.swift */; };
 		58B839735953E7EEC44BF249 /* ErrorProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B83FE1B0B757775A14A0AA /* ErrorProcessor.swift */; };
 		58B83991E3634AE41BD9C981 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B8368FDCB6449F27CBA993 /* App.swift */; };
 		58B839959174B2AEB5F76C69 /* MessageViewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B836E4E6273FAE372556DA /* MessageViewType.swift */; };
@@ -335,6 +336,7 @@
 		58B83BD829B1C2C4996A14BA /* AsyncManDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncManDelegate.swift; sourceTree = "<group>"; };
 		58B83BDC2E0B6050A85FFF5A /* View+ApplyIf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+ApplyIf.swift"; sourceTree = "<group>"; };
 		58B83BFFD0CB546CA1E705EF /* ChevronButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChevronButton.swift; sourceTree = "<group>"; };
+		58B83C15AD89C3E512D3713D /* StockResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StockResponse.swift; sourceTree = "<group>"; };
 		58B83C32B28D595ECC4061BA /* NavigateResettingRoot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigateResettingRoot.swift; sourceTree = "<group>"; };
 		58B83C3C95A1D6AE1E9ADC42 /* AppScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppScreen.swift; sourceTree = "<group>"; };
 		58B83C5DE966B930192DF928 /* StockDataSrc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StockDataSrc.swift; sourceTree = "<group>"; };
@@ -1115,6 +1117,7 @@
 			children = (
 				58B8309F8C108C6E4CAF5ED8 /* StockMapper.swift */,
 				58B83B548A439AF4724F3F43 /* StockChartDataResponse.swift */,
+				58B83C15AD89C3E512D3713D /* StockResponse.swift */,
 			);
 			path = Stock;
 			sourceTree = "<group>";
@@ -1639,6 +1642,7 @@
 				58B83534983CA8611A9F769F /* UIApplication+AppDelegate.swift in Sources */,
 				58B83B00719875361DCE2489 /* FlutterView.swift in Sources */,
 				58B833ABF339222DC9006F38 /* UIApplication+FlutterEngine.swift in Sources */,
+				58B8394F42D696E1DD36B9E2 /* StockResponse.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

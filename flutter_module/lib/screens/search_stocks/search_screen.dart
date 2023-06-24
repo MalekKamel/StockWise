@@ -3,21 +3,22 @@ import 'package:flutter_module/shared/core/date/app_date.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../pigeon/api.dart';
-import '../../main.dart';
 
 class SearchStockScreen extends StatefulWidget {
   SearchStockScreen({super.key});
 
   late HostStocksApi hostApi;
+  List<StockChartData> stockChartData = [];
   List<Stock> stocks = [];
 
   @override
   State<SearchStockScreen> createState() => _SearchStockScreenState();
 }
 
-class _SearchStockScreenState extends State<SearchStockScreen> {
+class _SearchStockScreenState extends State<SearchStockScreen>
+    implements FlutterStocksApi {
   final TextEditingController controller = TextEditingController(
-    text: 'GOOG',
+    text: 'TSLA',
   );
   DateTime? startDate;
 
@@ -25,15 +26,12 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
   void initState() {
     super.initState();
     _setup();
+    loadStocks();
   }
 
   _setup() {
     widget.hostApi = HostStocksApi();
-    FlutterStocksApi.setup(FlutterStockApiHandler((stocks) {
-      setState(() {
-        widget.stocks = stocks.nonNulls.toList();
-      });
-    }));
+    FlutterStocksApi.setup(this);
   }
 
   @override
@@ -70,6 +68,7 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
       alignment: Alignment.centerRight,
       child: MaterialButton(
         onPressed: () async {
+          // TODO: validate the date is not after end date
           final selectedDate = await _selectDate(context);
           if (selectedDate == null) {
             return;
@@ -90,19 +89,26 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
     return Expanded(
         child: SfCartesianChart(
       primaryXAxis: DateTimeAxis(),
-      series: <LineSeries<Stock, DateTime>>[
-        LineSeries<Stock, DateTime>(
-          dataSource: widget.stocks,
-          xValueMapper: (Stock data, _) => DateTime.parse(data.date),
-          yValueMapper: (Stock data, _) => data.close,
+      series: <LineSeries<StockChartData, DateTime>>[
+        LineSeries<StockChartData, DateTime>(
+          dataSource: widget.stockChartData,
+          xValueMapper: (StockChartData data, _) => DateTime.parse(data.date),
+          yValueMapper: (StockChartData data, _) => data.close,
         ),
       ],
     ));
   }
 
   void loadChartData() async {
-    widget.hostApi.loadStocks(
+    final response = await widget.hostApi.loadStockChart(
         controller.text, AppDate.format(startDate ?? DateTime.now()));
+    widget.stockChartData = response.nonNulls.toList();
+  }
+
+  void loadStocks() async {
+    final response = await widget.hostApi.loadStocks();
+    widget.stocks = response.nonNulls.toList();
+    setState(() {});
   }
 
   Future<DateTime?> _selectDate(BuildContext context) async {
@@ -116,4 +122,5 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
       lastDate: DateTime(2100),
     );
   }
+
 }

@@ -6,7 +6,8 @@
 import Foundation
 
 protocol StockRepoContract {
-    func loadStockChartData(ticker: String, date: Date) async throws -> [Stock]
+    func loadStockChartData(ticker: String, date: Date) async throws -> [StockChartData]
+    func loadStocks() async throws -> [StockResponse]
 }
 
 struct StockRepo: StockRepoContract {
@@ -17,8 +18,12 @@ struct StockRepo: StockRepoContract {
         self.src = src
     }
 
-    func loadStockChartData(ticker: String, date: Date) async throws -> [Stock] {
+    func loadStockChartData(ticker: String, date: Date) async throws -> [StockChartData] {
         try await src.loadStockChartData(ticker: ticker, date: date)
+    }
+
+    func loadStocks() async throws -> [StockResponse] {
+        try await src.loadStocks()
     }
 
 }

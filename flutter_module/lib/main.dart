@@ -27,15 +27,3 @@ class MyApp extends StatelessWidget {
   }
 }
 
-typedef StockReceived = void Function(List<Stock?> stock);
-
-class FlutterStockApiHandler extends FlutterStocksApi {
-  FlutterStockApiHandler(this.callback);
-
-  final StockReceived callback;
-
-  @override
-  void showStock(List<Stock?> stocks) {
-    callback(stocks);
-  }
-}

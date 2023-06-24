@@ -1,6 +1,22 @@
 import 'package:pigeon/pigeon.dart';
 
 class Stock {
+  final String symbol;
+  final String companyName;
+  final double avgPrice;
+  final double quantity;
+  final double ltp;
+
+  Stock({
+    required this.symbol,
+    required this.companyName,
+    required this.avgPrice,
+    required this.quantity,
+    required this.ltp,
+  });
+}
+
+class StockChartData {
   final String date;
 
   /// Open price
@@ -21,7 +37,7 @@ class Stock {
   /// Adjusted close price, by splits and dividends
   final double adjClose;
 
-  Stock(
+  StockChartData(
     this.date,
     this.open,
     this.high,
@@ -34,10 +50,13 @@ class Stock {
 
 @FlutterApi()
 abstract class FlutterStocksApi {
-  void showStock(List<Stock> stocks);
 }
 
 @HostApi()
 abstract class HostStocksApi {
-  void loadStocks(String symbol, String date);
+  @async
+  List<StockChartData> loadStockChart(String symbol, String date);
+
+  @async
+  List<Stock> loadStocks();
 }

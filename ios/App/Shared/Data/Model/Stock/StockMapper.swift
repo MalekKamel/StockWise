@@ -6,20 +6,35 @@ import Foundation
 
 struct StockMapper {
 
-    static func fromChartDataResponse(_ item: StockChartDataResponse) -> [Stock] {
-        let result = item.chart.result
-        let timestamps = result[0].timestamp
-        let quote = result[0].indicators.quote[0]
-        let openValues = quote.quoteOpen
-        let highValues = quote.high
-        let lowValues = quote.low
-        let closeValues = quote.close
-        let volumeValues = quote.volume
-        let adjCloseValues = result[0].indicators.adjClose[0].adjclose ?? []
+    static func fromStockResponse(_ items: [StockResponse]) -> [Stock] {
+        items.map { element in
+            fromStockResponse(element)
+        }
+    }
 
-        var items: [Stock] = []
+    static func fromStockResponse(_ item: StockResponse) -> Stock {
+        Stock(
+                symbol: item.symbol,
+                companyName: item.companyName,
+                avgPrice: item.avgPrice,
+                quantity: item.quantity,
+                ltp: item.ltp)
+    }
+
+    static func fromChartDataResponse(_ item: StockChartDataResponse) -> [StockChartData] {
+        let result = item.chart.result
+        let timestamps = result[0].timestamp ?? []
+        let quote = result[0].indicators.quote?[0]
+        let openValues = quote?.quoteOpen ?? []
+        let highValues = quote?.high ?? []
+        let lowValues = quote?.low ?? []
+        let closeValues = quote?.close ?? []
+        let volumeValues = quote?.volume ?? []
+        let adjCloseValues = result[0].indicators.adjClose?[0].adjclose ?? []
+
+        var items: [StockChartData] = []
         for i in 0..<timestamps.count {
-            let entry = Stock(date: String(timestamps[i]),
+            let entry = StockChartData(date: String(timestamps[i]),
                     open: openValues[i],
                     high: highValues[i],
                     low: lowValues[i],
