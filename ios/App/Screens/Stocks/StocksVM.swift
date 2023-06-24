@@ -47,7 +47,7 @@ extension StocksVM: HostStocksApi {
             }
             let response = try await self.stockRepo.loadStocks()
             onMainThread {
-                self.stocks = StockMapper.fromStockResponse(response)
+                self.stocks = StockMapper.fromStockResponse(response.stocks)
                 completion(Result.success(self.stocks))
             }
         }

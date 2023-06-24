@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' hide DatePickerTheme;
-import 'package:flutter_module/screens/search_stocks/search_stocks_vm.dart';
+import 'package:flutter_module/screens/search/search_stocks_vm.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../pigeon/api.dart';
@@ -26,17 +26,7 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
   @override
   void initState() {
     super.initState();
-    loadChartData();
-  }
-
-  void loadChartData() async {
-    widget.vm.loadChartData();
-    setState(() {});
-  }
-
-  void loadStocks() async {
-    widget.vm.loadStocks();
-    setState(() {});
+    _loadChartData();
   }
 
   @override
@@ -50,14 +40,16 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
   }
 
   Widget _bodyView() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          _searchTextField(),
-          _searchButton(),
-          _chartView(),
-        ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _searchTextField(),
+            _searchButton(),
+            _chartView(),
+          ],
+        ),
       ),
     );
   }
@@ -84,7 +76,7 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
           setState(() {
             widget.vm.startDate = selectedDate;
           });
-          loadChartData();
+          _loadChartData();
         },
         color: Theme.of(context).primaryColor,
         textColor: Colors.white,
@@ -94,8 +86,7 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
   }
 
   Widget _chartView() {
-    return Expanded(
-        child: SfCartesianChart(
+    return SfCartesianChart(
       primaryXAxis: DateTimeAxis(),
       series: <LineSeries<StockChartData, DateTime>>[
         LineSeries<StockChartData, DateTime>(
@@ -104,7 +95,7 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
           yValueMapper: (StockChartData data, _) => data.close,
         ),
       ],
-    ));
+    );
   }
 
   Future<DateTime?> _selectDate(BuildContext context) async {
@@ -117,5 +108,10 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
       firstDate: DateTime(2015, 8),
       lastDate: DateTime(2100),
     );
+  }
+
+  void _loadChartData() async {
+    await widget.vm.loadChartData();
+    setState(() {});
   }
 }

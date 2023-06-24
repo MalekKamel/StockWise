@@ -6,13 +6,13 @@ import Foundation
 
 struct StockMapper {
 
-    static func fromStockResponse(_ items: [StockResponse]) -> [Stock] {
+    static func fromStockResponse(_ items: [StockItemResponse]) -> [Stock] {
         items.map { element in
             fromStockResponse(element)
         }
     }
 
-    static func fromStockResponse(_ item: StockResponse) -> Stock {
+    static func fromStockResponse(_ item: StockItemResponse) -> Stock {
         Stock(
                 symbol: item.symbol,
                 companyName: item.companyName,

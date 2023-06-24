@@ -7,7 +7,7 @@ import Foundation
 
 protocol StockDataSrcContract {
     func loadStockChartData(ticker: String, date: Date) async throws -> [StockChartData]
-    func loadStocks() async throws -> [StockResponse]
+    func loadStocks() async throws -> StockResponse
 }
 
 struct StockDataSrc: StockDataSrcContract {
@@ -24,7 +24,7 @@ struct StockDataSrc: StockDataSrcContract {
         return StockMapper.fromChartDataResponse(response)
     }
 
-    func loadStocks() async throws -> [StockResponse] {
+    func loadStocks() async throws -> StockResponse {
         try await api.request(target: .stocks)
     }
 }

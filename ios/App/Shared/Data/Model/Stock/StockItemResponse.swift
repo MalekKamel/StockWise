@@ -5,6 +5,14 @@
 import Foundation
 
 struct StockResponse: Codable {
+    let stocks: [StockItemResponse]
+
+    enum CodingKeys: String, CodingKey {
+        case stocks = "stocks"
+    }
+}
+
+struct StockItemResponse: Codable {
     let symbol: String
     let companyName: String
     let avgPrice: Double

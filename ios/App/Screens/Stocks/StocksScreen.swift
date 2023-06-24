@@ -15,7 +15,7 @@ struct StocksScreen: AppScreen {
     @StateObject var flutterDependencies = FlutterDependencies()
 
     var bodyContent: some View {
-        FlutterView()
+        FlutterView(initialRoute: "/profile")
     }
 }
 

@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_module/screens/search_stocks/search_screen.dart';
-
-import 'pigeon/api.dart';
+import 'package:flutter_module/screens/main/main_screen.dart';
+import 'package:flutter_module/screens/profile_/profile_screen.dart';
+import 'package:flutter_module/screens/search/search_screen.dart';
 
 void main() => runApp(const MyApp());
 
@@ -21,9 +21,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routes: {
-        '/': (context) => SearchStockScreen.build()
+        '/': (context) => const MainScreen()
       },
     );
   }
 }
-
