@@ -1,6 +1,5 @@
 import '../../pigeon/api.dart';
 import '../../shared/core/date/app_date.dart';
-import '../../shared/data/model/stock/stock_data.dart';
 
 class SearchStocksVM implements FlutterStocksApi {
   final hostApi = HostStocksApi();

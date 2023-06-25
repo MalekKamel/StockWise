@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "appName": "StockWise",
+  "search": "Search",
+  "profile": "Profile",
+  "overallPl": "Overall P/L",
+  "todayPl": "Today's P/L",
+  "stocks": "Stocks",
+  "totalInvestedAmount": "Total Invested Amount",
+  "averagePrice": "Average Price",
+  "totalQuantity": "Total Quantity",
+  "lastTradedPrice": "Last Traded Price",
+  "currentValue": "Current Value",
+  "pl": "P/L"
+}

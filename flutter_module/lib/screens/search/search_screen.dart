@@ -3,6 +3,7 @@ import 'package:flutter_module/screens/search/search_stocks_vm.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../pigeon/api.dart';
+import '../../shared/core/localization/localizations.dart';
 
 class SearchStockScreen extends StatefulWidget {
   SearchStockScreen({super.key, required this.vm});
@@ -33,7 +34,7 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('StockWise'),
+        title: Text(localizations.appName),
       ),
       body: _bodyView(),
     );
@@ -80,7 +81,7 @@ class _SearchStockScreenState extends State<SearchStockScreen> {
         },
         color: Theme.of(context).primaryColor,
         textColor: Colors.white,
-        child: const Text('Load'),
+        child: Text(localizations.search),
       ),
     );
   }

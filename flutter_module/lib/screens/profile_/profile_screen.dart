@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide DatePickerTheme;
 import 'package:flutter_module/screens/profile_/profile_vm.dart';
+import 'package:flutter_module/shared/core/localization/localizations.dart';
 
 import '../../shared/data/model/stock/stock_data.dart';
 
@@ -48,11 +49,13 @@ class _SearchStockScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Overall P/L: ${data.overallPL} (${data.overallPLPercent}%)'),
-            Text('Today P/L: ${data.todayPl} (${data.todayPlPercent}%)'),
+            Text(
+                '${localizations.overallPl}: ${data.overallPL} (${data.overallPLPercent}%)'),
+            Text(
+                '${localizations.todayPl}: ${data.todayPl} (${data.todayPlPercent}%)'),
             const SizedBox(height: 16),
-            const Text('Stocks:',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(localizations.stocks,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -65,12 +68,16 @@ class _SearchStockScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                          'Total Invested Amount: ${stock.totalInvestedAmount}'),
-                      Text('Average Price: ${stock.averagePrice}'),
-                      Text('Total Quantity: ${stock.totalQuantity}'),
-                      Text('Last Traded Price: ${stock.lastTradedPrice}'),
-                      Text('Current Value: ${stock.currentValue}'),
-                      Text('P/L: ${stock.pl}'),
+                          '${localizations.totalInvestedAmount}: ${stock.totalInvestedAmount}'),
+                      Text(
+                          '${localizations.averagePrice}: ${stock.averagePrice}'),
+                      Text(
+                          '${localizations.totalQuantity}: ${stock.totalQuantity}'),
+                      Text(
+                          '${localizations.lastTradedPrice}: ${stock.lastTradedPrice}'),
+                      Text(
+                          '${localizations.currentValue}: ${stock.currentValue}'),
+                      Text('${localizations.pl}: ${stock.pl}'),
                     ],
                   ),
                 );
