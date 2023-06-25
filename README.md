@@ -15,8 +15,8 @@ the Libs folder from the root directory into the files section of Xcode.
 # Table of contents
 
 - [Technologies & Frameworks](#technologies--frameworks)
-- [Managing Communication Between Flutter and the Host](#managing-communication-between-flutter-and-the-host)
 - [Flutter](#flutter)
+- [Managing Communication Between Flutter and the Host](#managing-communication-between-flutter-and-the-host)
 - [Architecture](#architecture)
 - [App Modules](#app-modules)
 - [App Layers](#app-layers)
